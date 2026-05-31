@@ -6,6 +6,7 @@ Dieses Projekt ist aktuell **in Entwicklung**.
 - Java 21
 - Gradle
 - Paper API (1.20.x)
+- and Love ❤️
 
 ## Build
 ```powershell
