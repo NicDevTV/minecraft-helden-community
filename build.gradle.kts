@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.util.UUID
 
 plugins {
     java
@@ -34,6 +35,7 @@ tasks.test {
 
 tasks.processResources {
     val experimentalBuild = project.findProperty("experimentalBuild")?.toString()?.toBoolean() ?: false
+    val buildId = (System.getenv("GITHUB_SHA") ?: UUID.randomUUID().toString().replace("-", "")).take(10)
     val props =
         mapOf(
             "pluginName" to providers.gradleProperty("pluginName").get(),
@@ -43,6 +45,7 @@ tasks.processResources {
             "pluginAuthors" to providers.gradleProperty("pluginAuthors").get(),
             "pluginDescription" to providers.gradleProperty("pluginDescription").get(),
             "experimentalBuild" to experimentalBuild.toString(),
+            "buildId" to buildId,
         )
     inputs.properties(props)
     filesMatching("plugin.yml") {

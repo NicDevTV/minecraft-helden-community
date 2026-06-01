@@ -6,18 +6,18 @@
 package tv.nicdev.projectportal.bootstrap;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import java.io.InputStream;
-import java.util.Properties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import tv.nicdev.projectportal.infra.config.ConfigService;
 import tv.nicdev.projectportal.infra.platform.Paper120Capabilities;
 import tv.nicdev.projectportal.infra.platform.PlatformCapabilities;
+import tv.nicdev.projectportal.infra.update.UpdateCheckerService;
 
 public final class PluginBootstrap {
     private final JavaPlugin plugin;
     private ConfigService configService;
     private PlatformCapabilities platformCapabilities;
+    private UpdateCheckerService updateCheckerService;
 
     public PluginBootstrap(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -26,9 +26,11 @@ public final class PluginBootstrap {
     public void enable() {
         configService = new ConfigService(plugin);
         configService.load();
+        updateCheckerService = new UpdateCheckerService(plugin);
 
         platformCapabilities = new Paper120Capabilities();
         printBanner();
+        updateCheckerService.checkForUpdateNotice();
 
         plugin.getLogger().info("Enabled " + plugin.getName() + " on " + platformCapabilities.platformVersionLabel());
     }
@@ -46,7 +48,7 @@ public final class PluginBootstrap {
     }
 
     private void printBanner() {
-        boolean experimentalBuild = isExperimentalBuild();
+        boolean experimentalBuild = configService.isExperimentalBuild();
         String[] banner = {
             " _   _ _      ____             _______     __",
             "| \\ | (_) ___|  _ \\  _____   _|_   _\\ \\   / /",
@@ -94,16 +96,4 @@ public final class PluginBootstrap {
         }
     }
 
-    private boolean isExperimentalBuild() {
-        Properties properties = new Properties();
-        try (InputStream inputStream = plugin.getResource("build-flags.properties")) {
-            if (inputStream == null) {
-                return false;
-            }
-            properties.load(inputStream);
-            return Boolean.parseBoolean(properties.getProperty("experimentalBuild", "false"));
-        } catch (Exception ignored) {
-            return false;
-        }
-    }
 }
