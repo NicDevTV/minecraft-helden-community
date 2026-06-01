@@ -3,11 +3,11 @@ name: Build
 on:
   release:
     types:
-      - created
+      - published
 
 jobs:
   release:
-    if: github.event.release.draft == true && startsWith(github.event.release.tag_name, 'v')
+    if: startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
 
     permissions:
